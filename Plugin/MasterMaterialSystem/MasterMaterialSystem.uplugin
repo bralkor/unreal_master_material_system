@@ -1,0 +1,30 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "Master Material System",
+	"Description": "Adds a material system to the right click menu of the Content Browser",
+	"Category": "Material",
+	"CreatedBy": "Brian Kortbus",
+	"CreatedByURL": "https://linkedin.com/in/bkortbus",
+	"DocsURL": "https://github.com/bralkor/unreal_master_material_system/blob/main/README.md",
+	"MarketplaceURL": "",
+	"SupportURL": "https://github.com/bralkor/unreal_master_material_system/blob/main/README.md",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "MasterMaterialSystem",
+			"Type": "Runtime",
+			"LoadingPhase": "PreLoadingScreen"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "PythonScriptPlugin",
+			"Enabled": true
+		}
+	]
+}
