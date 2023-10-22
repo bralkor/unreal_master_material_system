@@ -10,8 +10,15 @@ and quickly replace existing materials with new Master Material Instances,<br>
 transferring textures over to the new Master Material Instance<br>
 <br>
 created by <a href="https://www.linkedin.com/in/bkortbus/">Brian Kortbus</a>
+<br>
+<br>
+<br>
+<a href="https://youtu.be/N3x0DmapOGM?si=rGmjLR0NFCg_zPeJ">Youtube Demo Video</a>
+
 </p>
 <br>
+
+
 
 ## Registering a Master Material
 
