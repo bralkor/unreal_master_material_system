@@ -110,11 +110,11 @@ focusing on the use of the texture rather than its file name.
 
 
 
-## Create from Master Material As Is
+## Create from Master Material as is
 
 <ul>
 
-Another feature is to just create a new MI in the current Content Browser folder. When no assets are selected
+Another feature is to create a new Material Instance from a Master Material in the current Content Browser folder as is. When no assets are selected
 the right click dropdown menu will display as `New From Master Material`:
 
 <ul>
