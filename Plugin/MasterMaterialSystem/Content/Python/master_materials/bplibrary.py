@@ -73,19 +73,14 @@ class PyMasterMaterialLibrary(unreal.BlueprintFunctionLibrary):
             replace_references (bool): if True, replace references from the old_material to the newly created instance material
         """
 
-        master_material_name = assets.get_metadata(master_material, constants.META_MATERIAL_DISPLAY_NAME)
-        old_name = old_material.get_name().split("M_", 1)[-1].split("MI_", 1)[-1]
-        new_name = f"MI_{master_material_name}_{old_name}".replace(" ", "_")
-
         # create the new material instance
-        asset_folder = str(Path(old_material.get_path_name()).parent)
-        new_material_instance = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
-            asset_name=new_name,
-            package_path=asset_folder,
-            asset_class=unreal.MaterialInstanceConstant,
-            factory=unreal.MaterialInstanceConstantFactoryNew()
+        print(f"Creating new MI in {old_material.get_path_name().rsplit('/', 1)[0]}")
+        new_material_instance = materials.create_new_material_instance(
+            destination_folder=old_material.get_path_name().rsplit("/", 1)[0],
+            master_material=master_material,
+            target_material=old_material,
+            should_save=False
         )
-        unreal.MaterialEditingLibrary.set_material_instance_parent(new_material_instance, master_material)
         material_info = materials.MaterialParamInfo(new_material_instance)
 
         # transfer the texture selections from the UI
@@ -147,24 +142,25 @@ class PyMasterMaterialLibrary(unreal.BlueprintFunctionLibrary):
                 print(f"\t{entry}")
 
         # close tool UI (no longer needed)
-        EUW_results = assets.find_assets(
+        found_editor_tools = assets.find_assets(
             name="CreateFromMasterMaterial",
             exact_match=True,
             class_types=["EditorUtilityWidgetBlueprint"],
             str_in_path="/MasterMaterialSystem/"
         )
-        if EUW_results:
+        if found_editor_tools:
             widget_id = EditorUtilitySubsystem.register_tab_and_get_id(
                 unreal.EditorAssetLibrary.load_asset(
-                    EUW_results[0].package_name
+                    found_editor_tools[0].package_name
                 )
             )
             EditorUtilitySubsystem.unregister_tab_by_id(widget_id)
 
         # focus content browser on new material instance
         package_path = new_material_instance.get_package().get_path_name()
-        print(f"Created {package_path} from {master_material_name}")
         unreal.EditorAssetLibrary().sync_browser_to_objects([package_path])
+        master_material_name = assets.get_metadata(master_material, constants.META_MATERIAL_DISPLAY_NAME)
+        print(f"Created {package_path} from {master_material_name}")
 
 
     @unreal.ufunction(

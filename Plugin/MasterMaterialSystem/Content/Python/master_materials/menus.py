@@ -10,7 +10,6 @@ from master_materials.unreal_systems import EditorUtilitySubsystem
 import unreal
 
 
-
 MENU_OWNER = "master_material_system"
 
 
@@ -204,6 +203,19 @@ class ApplyMasterMaterial(PythonMenuTool):
     def execute(self, context):
         selected_materials = unreal.EditorUtilityLibrary.get_selected_assets_of_class(unreal.MaterialInterface)
 
+        # If no materials are selected, just create a new MI in the current folder
+        if not selected_materials:
+            current_folder = unreal.EditorUtilityLibrary.get_current_content_browser_path()
+
+            new_material_instance = materials.create_new_material_instance(
+                current_folder,
+                self.material
+            )
+            package_path = new_material_instance.get_package().get_path_name()
+            unreal.EditorUtilityLibrary().sync_browser_to_folders([package_path.rsplit("/", 1)[0]])
+            unreal.EditorAssetLibrary().sync_browser_to_objects([package_path])
+            return
+
         # Get the EUW
         EUW_results = assets.find_assets(
             name="CreateFromMasterMaterial",
@@ -236,7 +248,7 @@ class ApplyMasterMaterial(PythonMenuTool):
     @unreal.ufunction(override=True)
     def can_execute(self, context):
         selected_materials = unreal.EditorUtilityLibrary.get_selected_assets_of_class(unreal.MaterialInterface) or []
-        return len(selected_materials) and self.material not in selected_materials
+        return not (selected_materials and self.material in selected_materials)
 
 
 def setup_menus():
@@ -246,25 +258,42 @@ def setup_menus():
     material_instance_asset_menu = unreal.ToolMenus.get().extend_menu(
         "ContentBrowser.AssetContextMenu.MaterialInstanceConstant"
     )
+    create_new_asset_menu = unreal.ToolMenus.get().extend_menu("ContentBrowser.AddNewContextMenu")
 
-    # Shot Tools (shot management + editorial)
+    material_menus = [
+        material_asset_menu,
+        material_instance_asset_menu
+    ]
+
     section = "Master Materials"
-    material_asset_menu.add_section(section, section)
-    material_instance_asset_menu.add_section(section, section)
+    for menu_object in material_menus:
+        menu_object.add_section(section, section)
+    create_new_asset_menu.add_section(section, section)
 
-    # mark master materials
+    # mark as master materials
     ToggleMasterMaterial(material_asset_menu, section)
+    
+    master_materials = assets.find_assets(metadata={constants.META_IS_MASTER_MATERIAL: True}, class_types=["Material"])
 
-    # Add the drop-down menus for both `Materials` and `Material Instances`
-    material_dropdown = material_asset_menu.add_sub_menu(
-        MENU_OWNER, section, "ApplyMasterMaterials", "Apply Master Material"
-    )
-    material_instance_dropdown = material_instance_asset_menu.add_sub_menu(
-        MENU_OWNER, section, "ApplyMasterMaterials", "Apply Master Material"
-    )
-    for asset in assets.find_assets(metadata={constants.META_IS_MASTER_MATERIAL: True}, class_types=["Material"]):
-        ApplyMasterMaterial(asset.get_asset(), material_dropdown)
-        ApplyMasterMaterial(asset.get_asset(), material_instance_dropdown)
+    # Add the drop-down menus to apply/create material instances
+    if master_materials:
+        dropdown_menus = list()
+        for menu_object in material_menus:
+            dropdown_menus.append(
+                menu_object.add_sub_menu(
+                    MENU_OWNER, section, "ApplyMasterMaterials", "Apply Master Material"
+                )
+            )
+        dropdown_menus.append(
+            create_new_asset_menu.add_sub_menu(
+                MENU_OWNER, section, "NewFromMasterMaterials", "New From Master Material"
+            )
+        )
+
+        # Register each master materials to the drop-down menus
+        for material_asset_data in master_materials:
+            for menu_object in dropdown_menus:
+                ApplyMasterMaterial(material_asset_data.get_asset(), menu_object)
 
 
 def remove_menus():

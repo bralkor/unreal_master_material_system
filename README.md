@@ -110,6 +110,27 @@ focusing on the use of the texture rather than its file name.
 
 
 
+## Create from Master Material As Is
+
+<ul>
+
+Another feature is to just create a new MI in the current Content Browser folder. When no assets are selected
+the right click dropdown menu will display as `New From Master Material`:
+
+<ul>
+<img src="resources/MM_create_MI_as_is.png" width="450">
+</ul>
+
+This will quickly create a new MI in the current Content Browser folder that we can then rename/edit:
+
+<ul>
+<img src="resources/MM_new_MI.png" width="250">
+</ul>
+
+</ul><br><br>
+
+
+
 ## Unregistering a Master Material
 
 <ul>

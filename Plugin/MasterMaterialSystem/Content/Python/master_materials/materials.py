@@ -5,6 +5,7 @@ from master_materials import (
 )
 
 from master_materials.unreal_systems import (
+    AssetTools,
     AssetEditorSubsystem,
     EditorAssetSubsystem
 )
@@ -15,7 +16,7 @@ import unreal
 # Utility class to make material parameters more convenient to interact with
 class MaterialParamInfo:
     material = None
-    data = dict()
+    parameters = dict()
     nodes = dict()
 
     def __init__(self, material):
@@ -34,7 +35,29 @@ class MaterialParamInfo:
 
     def populate_data(self):
         """Populate the data from the material graph"""
-        self.data = dict()
+        self.parameters = dict()
+        self.nodes = dict()
+
+        # collect parameters as {param_name: data_type}
+        self.parameters = {
+            str(item): float
+            for item in
+            unreal.MaterialEditingLibrary.get_scalar_parameter_names(self.material)
+        } | {
+            str(item): bool
+            for item in
+            unreal.MaterialEditingLibrary.get_static_switch_parameter_names(self.material)
+        } | {
+            str(item): unreal.Texture
+            for item in
+            unreal.MaterialEditingLibrary.get_texture_parameter_names(self.material)
+        } | {
+            str(item): unreal.LinearColor
+            for item in
+            unreal.MaterialEditingLibrary.get_vector_parameter_names(self.material)
+        }
+        for k, v in self.parameters.items():
+            print(f"\t{k} :: {v}")
 
         # Loop through each final output node of the parent material
         for attr_member in dir(unreal.MaterialProperty):
@@ -51,13 +74,9 @@ class MaterialParamInfo:
             return
 
         # Register any parameter nodes that are found
-        if isinstance(node, unreal.MaterialExpressionParameter)\
-                or isinstance(node, unreal.MaterialExpressionTextureSampleParameter):
-            group_name = str(node.get_editor_property("group"))
+        if isinstance(node, unreal.MaterialExpressionParameter) or isinstance(node, unreal.MaterialExpressionTextureSampleParameter):
             property_name = str(node.get_editor_property("parameter_name"))
-            self.data.setdefault(group_name, [])
-            if property_name not in self.data[group_name]:
-                self.data[group_name].append(property_name)
+            if property_name not in self.nodes:
                 self.nodes[property_name] = node
 
         # Walk up the node chain
@@ -74,30 +93,11 @@ class MaterialParamInfo:
 
     def get_parameter_names(self):
         """Get all parameter names on this material"""
-        parameter_names = []
-        for k, v in self.data.items():
-            parameter_names.extend(v)
-
-        return sorted(parameter_names)
-
-    def get_parameter_group(self, parameter):
-        """Get a given parameter's group"""
-        node = self.get_node(parameter)
-
-        return node.get_editor_property("group")
+        return sorted([k for k in self.parameters.keys()])
 
     def get_parameter_type(self, parameter):
         """Get the data type of the given parameter"""
-        node = self.get_node(parameter)
-
-        if isinstance(node, unreal.MaterialExpressionScalarParameter):
-            return float
-        elif isinstance(node, unreal.MaterialExpressionStaticSwitchParameter):
-            return bool
-        elif isinstance(node, unreal.MaterialExpressionTextureSampleParameter2D):
-            return unreal.Texture
-        elif isinstance(node, unreal.MaterialExpressionVectorParameter):
-            return unreal.LinearColor
+        return self.parameters.get(parameter)
 
     def get_parameter_value(self, parameter):
         """Get the value of the given parameter"""
@@ -155,8 +155,8 @@ class MaterialParamInfo:
 
         # handle normal materials
         else:
-            node = self.get_node(parameter)
-            if node_type == unreal.Texture:
+            node = self.nodes.get(parameter)
+            if self.get_parameter_type(parameter) == unreal.Texture:
                 node.set_editor_property("texture", value)
             else:
                 node.set_editor_property("default_value", value)
@@ -174,6 +174,74 @@ class MaterialParamInfo:
         else:
             unreal.MaterialEditingLibrary.recompile_material(self.parent_material)
 
+
+def create_new_material_instance(destination_folder, master_material, asset_name=None, target_material=None, should_save=True, should_open=True):
+    """
+    Create a new material instance based on a master material
+
+    parameters:
+        destination_folder (str): the folder path of the new asset
+        master_material (unreal.Material): the master material to create an instance of
+        asset_name (str): If provided, use this name instead of generating one dynamically
+        target_material (unreal.MaterialInterface): If provided, a target material to incorporate in the name
+        should_save (bool): whether to immediately save the asset after creation
+        should_open (bool): whether to open the asset editor
+
+    return:
+        unreal.MaterialInstanceConstant: the new material instance asset
+    """
+    asset_name = asset_name or generate_new_master_material_instance_name(destination_folder, master_material, target_material)
+    print(f"Okay....")
+    print(f"\tname:   {asset_name}")
+    print(f"\tfolder: {destination_folder}")
+
+    new_material_instance = AssetTools.create_asset(
+        asset_name=asset_name,
+        package_path=destination_folder,
+        asset_class=unreal.MaterialInstanceConstant,
+        factory=unreal.MaterialInstanceConstantFactoryNew()
+    )
+    print(f"Success? {new_material_instance}")
+    if not new_material_instance:
+        raise RuntimeError(f"Something went wrong here.... sigh.")
+    unreal.MaterialEditingLibrary.set_material_instance_parent(new_material_instance, master_material)
+
+    if should_save:
+        assets.save_asset(new_material_instance)
+
+    if should_open:
+        AssetEditorSubsystem.open_editor_for_assets([new_material_instance])
+
+    return new_material_instance
+
+
+def generate_new_master_material_instance_name(destination_folder, master_material, target_material=None):
+    """
+    Generate a unique name based on the provided Master Material. If a target material is provided it
+    will be incorporated in the new name
+
+    parameters:
+        destination_folder (str): the Content Browser folder to place the new material
+        master_material (unreal.Material): the master material to create a MI name based on
+        target_material (unreal.MaterialInterface): If provided, a target material to incorporate in the name
+
+    return:
+        str: a unique name to use for the new MI
+    """
+    # Get the master material name (or reuse
+    master_material_name = assets.get_metadata(master_material, constants.META_MATERIAL_DISPLAY_NAME)
+    if not master_material_name:
+        master_material_name = master_material_name.get_name().split("M_", 1)[-1].split("MI_", 1)[-1]
+
+    new_name = None
+    if target_material:
+        old_name = target_material.get_name().split("M_", 1)[-1].split("MI_", 1)[-1]
+        new_name = f"MI_{master_material_name}_{old_name}".replace(" ", "_")
+    else:
+        new_name = f"MI_{master_material_name}".replace(" ", "_")
+
+    new_asset_path = f"{destination_folder}/{new_name}"
+    return AssetTools.create_unique_asset_name(new_asset_path, "")[1]
 
 def register_master_material(material, display_name=""):
     """
