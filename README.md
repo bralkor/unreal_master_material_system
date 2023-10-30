@@ -4,13 +4,7 @@
 
 <p align="center">
 A Master Material System plugin for UE5<br>
-<br>
-This plugin allows us to mark Master Materials in the Content Browser<br>
-and quickly replace existing materials with new Master Material Instances,<br>
-transferring textures over to the new Master Material Instance<br>
-<br>
 created by <a href="https://www.linkedin.com/in/bkortbus/">Brian Kortbus</a>
-<br>
 <br>
 <br>
 <a href="https://youtu.be/N3x0DmapOGM?si=rGmjLR0NFCg_zPeJ">Youtube Demo Video</a>
@@ -19,22 +13,39 @@ created by <a href="https://www.linkedin.com/in/bkortbus/">Brian Kortbus</a>
 <br>
 
 
+## Overview
+<ul>
+
+This plugin adds a Master Material system to the Content Browser's right click menu. Materials may be
+registered or unregistered as Master Materials in this system. With a Master Material registered, this
+toolset adds a right click menu option to create new Material Instances in any Content Browser folder.
+
+With another material selected, we can also apply a Master Material to that material. This provides an
+editor tool window to transfer textures over to the new Material Instance as well as the option to update
+references to use the new Material Instance.
+
+</ul><br><br>
+
+
 
 ## Registering a Master Material
 
 <ul>
+
+The first step is to register a material as a Master Material in the right click menu:
+
 <img src="resources/MM_mark_material.gif" width="600">
 
 In the Content Browser, with a Material selected, use the new `Register Master Material` option
 found in the Right Click Menu under the `Master Material` section.
 
-A popup window will let you set the Master Material's display name in the system:
+A popup window will let us set the Master Material's display name in the system:
 
 <ul>
 <img src="resources/MM_display_name.png" width="300">
 </ul>
 
-Once the display name is chosen, your new Master Material will be listed in the `Apply Master Material` 
+Once the display name is chosen, our new Master Material will be listed in the `Apply Master Material` 
 dropdown menu:
 
 <ul>
@@ -45,16 +56,41 @@ dropdown menu:
 
 
 
+## Create from Master Material as is
+
+<ul>
+
+The most direct feature is to create a new Material Instance from a Master Material in the current Content Browser folder
+as is. With nothing selected in the Content Browser, the right click dropdown menu will display as `New From Master Material`:
+
+<ul>
+<img src="resources/MM_create_MI_as_is.png" width="450">
+</ul>
+
+This will quickly create a new MI in the current Content Browser folder that we can then rename/edit:
+
+<ul>
+<img src="resources/MM_new_MI.png" width="250">
+</ul>
+
+</ul><br><br>
+
+
+
 ## Applying a Master Material
 
 <ul>
+
+A more interactive toolset is the ability to apply a Master Material to another material. This gives us the option
+to transfer textures over to the new Material Instance and the option to update any uses of the old material to use
+the newly created Material Instance:
 
 <img src="resources/MM_apply_master_material.gif" width="600">
 
 Applying a Master Material will create a new Material Instance of the desired Master Material next
 to the selected material in the Content Browser that we want to replace.
 
-A popup window will let you transfer any textures over to this new Material Instance's texture parameters
+A popup window will let us transfer any textures over to this new Material Instance's texture parameters
 from the old material:
 
 <ul>
@@ -105,27 +141,6 @@ of the previous section, here is the window if we apply a Master Material to tha
 When transferring textures from a Material Instance it will use the parameter names instead of the texture names.
 In this case we are transferring textures from the old material's parameter slot to the new material's parameter slot,
 focusing on the use of the texture rather than its file name.
-
-</ul><br><br>
-
-
-
-## Create from Master Material as is
-
-<ul>
-
-Another feature is to create a new Material Instance from a Master Material in the current Content Browser folder as is. When no assets are selected
-the right click dropdown menu will display as `New From Master Material`:
-
-<ul>
-<img src="resources/MM_create_MI_as_is.png" width="450">
-</ul>
-
-This will quickly create a new MI in the current Content Browser folder that we can then rename/edit:
-
-<ul>
-<img src="resources/MM_new_MI.png" width="250">
-</ul>
 
 </ul><br><br>
 
