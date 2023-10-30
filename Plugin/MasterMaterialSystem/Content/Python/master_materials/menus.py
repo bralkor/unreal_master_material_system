@@ -172,7 +172,6 @@ class ToggleMasterMaterial(PythonMenuTool):
 class ApplyMasterMaterial(PythonMenuTool):
     tool_name = "<Material Name>"
     tool_display_name = "<Display Name>"
-    tooltip = "create a material instance from this master material"
     material = unreal.uproperty(unreal.Material)
     display_name = unreal.uproperty(str)
 
@@ -186,6 +185,7 @@ class ApplyMasterMaterial(PythonMenuTool):
         )
         self.material = material
         self.display_name = assets.get_metadata(material, constants.META_MATERIAL_DISPLAY_NAME, material.get_name())
+        self.tooltip = f"create a new Material Instance of {self.tool_name}"
 
         if menu:
             self.init_entry(
@@ -277,6 +277,10 @@ def setup_menus():
 
     # Add the drop-down menus to apply/create material instances
     if master_materials:
+        master_materials = sorted(
+            master_materials,
+            key=lambda asset_data: assets.get_metadata(asset_data.get_asset(), constants.META_MATERIAL_DISPLAY_NAME).lower()
+        )
         dropdown_menus = list()
         for menu_object in material_menus:
             dropdown_menus.append(
