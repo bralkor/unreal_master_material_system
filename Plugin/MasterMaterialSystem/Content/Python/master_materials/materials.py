@@ -56,8 +56,6 @@ class MaterialParamInfo:
             for item in
             unreal.MaterialEditingLibrary.get_vector_parameter_names(self.material)
         }
-        for k, v in self.parameters.items():
-            print(f"\t{k} :: {v}")
 
         # Loop through each final output node of the parent material
         for attr_member in dir(unreal.MaterialProperty):
@@ -191,9 +189,6 @@ def create_new_material_instance(destination_folder, master_material, asset_name
         unreal.MaterialInstanceConstant: the new material instance asset
     """
     asset_name = asset_name or generate_new_master_material_instance_name(destination_folder, master_material, target_material)
-    print(f"Okay....")
-    print(f"\tname:   {asset_name}")
-    print(f"\tfolder: {destination_folder}")
 
     new_material_instance = AssetTools.create_asset(
         asset_name=asset_name,
@@ -201,7 +196,6 @@ def create_new_material_instance(destination_folder, master_material, asset_name
         asset_class=unreal.MaterialInstanceConstant,
         factory=unreal.MaterialInstanceConstantFactoryNew()
     )
-    print(f"Success? {new_material_instance}")
     if not new_material_instance:
         raise RuntimeError(f"Something went wrong here.... sigh.")
     unreal.MaterialEditingLibrary.set_material_instance_parent(new_material_instance, master_material)
