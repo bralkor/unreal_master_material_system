@@ -3,14 +3,12 @@
 <h1 align="center">Unreal Master Material System</h1>
 
 <p align="center">
-A Master Material System plugin for UE5<br>
+A Master Material System plugin developed in Unreal Engine 5.3<br>
 created by <a href="https://www.linkedin.com/in/bkortbus/">Brian Kortbus</a>
 <br>
 <br>
-<a href="https://youtu.be/5u_jgtToYwE">Youtube Demo Video</a>
-
+<a href="https://youtu.be/5u_jgtToYwE"><img src="resources/MM_youtube_link.png"></a>
 </p>
-<br>
 
 
 ## Overview
