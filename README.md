@@ -7,7 +7,7 @@ A Master Material System plugin for UE5<br>
 created by <a href="https://www.linkedin.com/in/bkortbus/">Brian Kortbus</a>
 <br>
 <br>
-<a href="https://youtu.be/N3x0DmapOGM?si=rGmjLR0NFCg_zPeJ">Youtube Demo Video</a>
+<a href="https://youtu.be/5u_jgtToYwE">Youtube Demo Video</a>
 
 </p>
 <br>
@@ -16,13 +16,21 @@ created by <a href="https://www.linkedin.com/in/bkortbus/">Brian Kortbus</a>
 ## Overview
 <ul>
 
+Master Materials are parent materials we wish to make Material Instances of to use on our assets in Unreal. 
+Using Material Instances can greatly improve material performance and can streamline the customization
+of common materials for all of our unique assets. To learn more about Material Instances, 
+[the Epic docs provide a good overview of Material Instances](
+https://docs.unrealengine.com/5.3/en-US/instanced-materials-in-unreal-engine/
+).
+
 This plugin adds a Master Material system to the Content Browser's right click menu. Materials may be
 registered or unregistered as Master Materials in this system. With a Master Material registered, this
 toolset adds a right click menu option to create new Material Instances in any Content Browser folder.
 
 With another material selected, we can also apply a Master Material to that material. This provides an
-editor tool window to transfer textures over to the new Material Instance as well as the option to update
-references to use the new Material Instance.
+editor tool window in which we may transfer textures to the new Material Instance's parameter slots. 
+This window also provides an option to update any Static or Skeletal Meshes to use this new Material
+Instance.
 
 </ul><br><br>
 
@@ -81,16 +89,16 @@ This will quickly create a new MI in the current Content Browser folder that we 
 
 <ul>
 
-A more interactive toolset is the ability to apply a Master Material to another material. This gives us the option
-to transfer textures over to the new Material Instance and the option to update any uses of the old material to use
-the newly created Material Instance:
+A more interactive feature is the ability to apply a Master Material to another material. This gives us the option
+to transfer textures over to the new Material Instance and the option to update any assets using the old material to
+use the newly created Material Instance:
 
 <img src="resources/MM_apply_master_material.gif" width="600">
 
 Applying a Master Material will create a new Material Instance of the desired Master Material next
 to the selected material in the Content Browser that we want to replace.
 
-A popup window will let us transfer any textures over to this new Material Instance's texture parameters
+A tool window will let us transfer any textures over to this new Material Instance's texture parameters
 from the old material:
 
 <ul>
@@ -98,8 +106,8 @@ from the old material:
 </ul>
 
 Each Texture Parameter will have a slot in the UI. Use the dropdown menu for each texture parameter slot
-to transfer a texture from the material we're replacing. Clicking on a texture icon preview will focus the 
-Content Browser to that texture.
+to transfer a texture from the material we're replacing. The texture marked with `(default)` is the Master
+Material's default parameter value, all other textures in the dropdown menu are sourced from the old material.
 
 <br>
 
@@ -135,11 +143,11 @@ We can also apply a Master Material to a Material Instance as well! Using the re
 of the previous section, here is the window if we apply a Master Material to that Material Instance:
 
 <ul>
-<img src="resources/MM_applying_on_a_MI.png" width="450">
+<img src="resources/MM_applying_on_a_MI.png" width="350">
 </ul>
 
 When transferring textures from a Material Instance it will use the parameter names instead of the texture names.
-In this case we are transferring textures from the old material's parameter slot to the new material's parameter slot,
+In this case we are transferring from the old material's parameter slots to the new material's parameter slots,
 focusing on the use of the texture rather than its file name.
 
 </ul><br><br>
@@ -159,5 +167,22 @@ the `Unregister` option:
 
 This will not delete the material or change any existing assets beyond removing it from the list
 of available Master Materials.
+
+</ul><br><br>
+
+
+
+## Update Log
+
+<ul>
+
+4 November 2023
+
+<ul>
+
+- updated README
+- fixed tooltip typo
+</ul>
+
 
 </ul><br><br>

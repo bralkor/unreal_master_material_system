@@ -72,7 +72,7 @@ class UserInputField(unreal.Object):
 
     display_name = unreal.uproperty(
         str,
-        dict(ToolTip="The display name to use for this master material in the Right Click Menu")
+        dict(tool_tip="The display name to use for this master material in the Right Click Menu")
     )
 
     def __init__(self):
@@ -83,7 +83,7 @@ class UserInputField(unreal.Object):
 class ToggleMasterMaterial(PythonMenuTool):
     tool_name = "MarkAsMasterMaterial"
     tool_display_name = "Mark As Master Material"
-    tooltip = "Set or Unset this material as a Master Material"
+    tool_tip = "Set or Unset this material as a Master Material"
     material = unreal.uproperty(unreal.MaterialInterface)
 
     @unreal.ufunction(override=True)
@@ -185,7 +185,7 @@ class ApplyMasterMaterial(PythonMenuTool):
         )
         self.material = material
         self.display_name = assets.get_metadata(material, constants.META_MATERIAL_DISPLAY_NAME, material.get_name())
-        self.tooltip = f"create a new Material Instance of {self.tool_name}"
+        self.tool_tip = f"create a new Material Instance of {self.tool_name}"
 
         if menu:
             self.init_entry(
@@ -194,7 +194,7 @@ class ApplyMasterMaterial(PythonMenuTool):
                 section,
                 self.tool_name,
                 self.display_name,
-                self.tooltip
+                self.tool_tip
             )
             menu.add_menu_entry_object(self)
 
